@@ -86,12 +86,12 @@ export class Fork {
 
     /** Replaces the association of a window in a fork with another */
     replace_window(a: Entity, b: Entity): boolean {
+        if (!this.right || this.right.inner.kind !== 2 || this.left.inner.kind !== 2) return false;
+
         if (this.left.is_window(a)) {
-            this.left.entity = b;
-        } else if (this.right) {
-            this.right.entity = b;
+            this.left.inner.entity = b;
         } else {
-            return false;
+            this.right.inner.entity = b;
         }
 
         return true;
@@ -191,7 +191,7 @@ export class Fork {
             if (this.workspace !== workspace) {
                 this.workspace = workspace;
                 for (const child_node of forest.iter(this.entity, node.NodeKind.FORK)) {
-                    let child = forest.forks.get(child_node.entity);
+                    let child = forest.forks.get((child_node.inner as node.NodeFork).entity);
                     if (child) child.workspace = workspace;
                 }
             }

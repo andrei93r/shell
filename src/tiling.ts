@@ -13,6 +13,7 @@ import * as Tweener from 'tweener';
 import type { Entity } from './ecs';
 import type { Rectangle } from './rectangle';
 import type { Ext } from './extension';
+import type { NodeWindow } from './node';
 import { AutoTiler } from './auto_tiler';
 
 const { Meta } = imports.gi;
@@ -296,10 +297,14 @@ export class Tiler {
                 if (parent) {
                     const fork = ext.auto_tiler.forest.forks.get(parent);
                     if (fork) {
-                        const temp = fork.left.entity;
-                        fork.left.entity = (fork.right as any).entity;
-                        (fork.right as any).entity = temp;
-                        ext.auto_tiler.tile(ext, fork, fork.area as any);
+                        // Move the right window to the left, and the left window to the right.
+                        const temp = (fork.left.inner as NodeWindow).entity;
+
+                        if (!fork.right) return;
+
+                        (fork.left.inner as NodeWindow).entity = (fork.right.inner as NodeWindow).entity;
+                        (fork.right.inner as NodeWindow).entity = temp;
+                        ext.auto_tiler.tile(ext, fork, fork.area);
                         watching = focused
                     }
                 }
